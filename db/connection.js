@@ -1,19 +1,16 @@
-const mysql = require('mysql2');
-const util = require("util");
+const mysql = require("mysql2");
 
-// Connect to database
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        // MySQL username,
-        user: 'root',
-        // MySQL password
-        password: 'password',
-        database: 'tracker_db'
-    },
-    console.log(`Connected to the courses_db database.`)
-);
+const connection = mysql.createConnection({
+  host: "localhost",
+  // Your username
+  user: "root",
+  // Your password
+  password: "password",
+  database: "tracker_db"
+});
 
-db.query = util.promisify(db.query);
+connection.connect(function (err) {
+  if (err) throw err;
+});
 
-module.exports = db;
+module.exports = connection;
