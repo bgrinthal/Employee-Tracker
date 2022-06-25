@@ -4,14 +4,9 @@
 
 // STEPS
 // 1. Declare a class for database methods encapsulating all SQL statements
-class sqlStatements {
-    // 2. Exports the database object instantiated (using "new") from the database class, passing connection object to the class constructor
-    constructor(connection) {
-        this.connection = connection
-    }
-}
+// 2. Exports the database object instantiated (using "new") from the database class, passing connection object to the class constructor
 
-module.export = sqlStatements(connection);
+
 
 
 // As suggested in README.md guideline for this homework, you can choose to use constructor functions or class to develop the functions
@@ -33,19 +28,19 @@ module.export = sqlStatements(connection);
 const connection = require("./connection");
 
 // class - for database or database access object
-class db {
+class DB {
     //  1. constructor - takes in database connection as input parameter and assign it to the instant variable
     constructor(connection) {
         this.connection = connection
     }
     //  2. method - find all employees, join with roles and departments to display their roles, salaries, departments, and managers
     viewEmployees() {
-        return this.connection.query(
-            `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(e2.first_name, ' ' , e2.last_name) AS manager
+        return this.connection.promise().query(
+            `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(emp.first_name, ' ' , emp.last_name) AS manager
             FROM employee 
             LEFT JOIN role ON role.id = employee.role_id 
             LEFT JOIN department ON department.id = role.department_id
-            LEFT JOIN employee AS e2 ON e2.id = employee.manager_id`
+            LEFT JOIN employee AS emp ON emp.id = employee.manager_id`
         );
     } 
     //  3. method - create a new employee - takes employee object as input parameter
@@ -71,7 +66,7 @@ class db {
         );
     }
     //  6. method - create a new role - takes in role object as input parameter
-    createRole(role) {
+    addRole(role) {
         return this.connection.query(
             `INSERT INTO role SET ?`,
             role
@@ -79,8 +74,8 @@ class db {
     }
     //  7. method - find all departments
     viewDepartments() {
-        return this.connection.query(
-            `SELECT department.id, department.name, SUM(role.salary) AS utilized_budget 
+        return this.connection.promise().query(
+            `SELECT department.id, department.name
             FROM department 
             LEFT JOIN role ON role.department_id = department.id 
             LEFT JOIN employee ON employee.role_id = role.id 
@@ -88,13 +83,15 @@ class db {
         );
     }
     //  8. method - create a new department - takes in department object as input parameter
-    createDepartment(department) {
+    addDepartment(department) {
         return this.connection.query(
             `INSERT INTO department SET ?`,
             department
         );
     }
 };
+
+module.exports = new DB(connection);
 
 // ================
 // OPTIONAL METHODS
