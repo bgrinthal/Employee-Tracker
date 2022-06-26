@@ -66,10 +66,9 @@ class DB {
         );
     }
     //  6. method - create a new role - takes in role object as input parameter
-    addRole(role) {
+    addRole(title, salary, index) {
         return this.connection.query(
-            `INSERT INTO role SET ?`,
-            role
+            `INSERT INTO role (title, salary, department_id) VALUES ('${title}, ${salary}, ${index}')`
         );
     }
     //  7. method - find all departments

@@ -155,24 +155,49 @@ function addDept() {
 //  2. call function to load main prompt for questions
 //
 
-// functon - Add a role
 function addRo() {
-    inquirer
-        .prompt(
-            questions = ([
+    let departments = []
+
+    connection.query(`SELECT * FROM department`, (err, data) => {
+        if (err) throw err;
+
+        for (let i = 0; i < data.length; i++) { 
+            departments.push(data[i].name)
+        }
+        inquirer
+            .prompt([
                 {
                     type: 'input',
-                    name: 'department',
-                    message: 'What department would you like to add?',
+                    name: 'title',
+                    message: 'What role would you like to add?',
                 },
-            ])
-        )
-        .then(({ department }) => {
-            db.addDepartment(department)
-            console.log(`Added ${department} department!`)
-            init();
-        })
-}
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'What is the salary for this role?',
+                },
+                {
+                    type: 'list',
+                    name: 'department_id',
+                    message: 'What department does this role belong to?',
+                    choices: departments
+                }
+            ]).then(({ title, salary, department_id }) => {
+                let index = departments.indexOf(department_id)
+                console.log(index)
+                db.addRole(title, salary, index)
+                console.log(`Added ${title} role!`)
+                init();
+                // let index = departments.indexOf(department_id)
+
+                // connection.query(`INSERT INTO role (title, salary, department_id) VALUES ('${title}', '${salary}', ${index})`, function (err, data) {
+                //     if (err) throw err;
+                //     console.log(`Added`)
+                    // init();
+                })
+            })
+    }
+
 //  **prompt for user to enter the role, the salary, and what department the role belongs to
 //  1. call find all departments method on database connection to get array of existing department records
 //      in .then call back, create array of objects with names and ids from returned data with .map() method
