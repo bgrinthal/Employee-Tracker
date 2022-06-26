@@ -53,10 +53,10 @@ function init() {
                 viewRo();
             } else if (answer.start === "View all employees") {
                 viewEmp();
-            } else if (answer.start === "Add a departmen") {
+            } else if (answer.start === "Add a department") {
                 addDept();
             } else if (answer.start === "Add a role") {
-                addRole();
+                addRo();
             } else if (answer.start === "Add a employee") {
                 addEmployee();
             } else if (answer.start === "Add a employee role") {
@@ -133,32 +133,21 @@ function viewDept() {
 //
 
 // Add a department
-function init() {
+function addDept() {
     inquirer
         .prompt(
             questions = ([
                 {
-                    type: 'list',
+                    type: 'input',
                     name: 'department',
                     message: 'What department would you like to add?',
-                    choices: [
-                        "View all departments",
-                        "View all roles",
-                        "View all employees",
-                        "Add a department",
-                        "Add a role",
-                        "Add a employee",
-                        "Add a employee role",
-                        "Quit"
-                    ]
                 },
             ])
-
         )
-        .then((answer) => {
-            if (answer.start === "View all departments") {
-                viewDept();
-            }
+        .then(({ department }) => {
+            db.addDepartment(department)
+            console.log(`Added ${department} department!`)
+            init();
         })
 }
 //  1. prompt user for the name of the department
@@ -167,6 +156,23 @@ function init() {
 //
 
 // functon - Add a role
+function addRo() {
+    inquirer
+        .prompt(
+            questions = ([
+                {
+                    type: 'input',
+                    name: 'department',
+                    message: 'What department would you like to add?',
+                },
+            ])
+        )
+        .then(({ department }) => {
+            db.addDepartment(department)
+            console.log(`Added ${department} department!`)
+            init();
+        })
+}
 //  **prompt for user to enter the role, the salary, and what department the role belongs to
 //  1. call find all departments method on database connection to get array of existing department records
 //      in .then call back, create array of objects with names and ids from returned data with .map() method

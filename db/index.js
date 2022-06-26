@@ -85,8 +85,7 @@ class DB {
     //  8. method - create a new department - takes in department object as input parameter
     addDepartment(department) {
         return this.connection.query(
-            `INSERT INTO department SET ?`,
-            department
+            `INSERT INTO department (name) VALUES ('${department}')`
         );
     }
 };
