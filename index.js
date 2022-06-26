@@ -5,7 +5,7 @@
 */
 
 // Import inquirer
-const inquirer = require('inquirer'); 
+const inquirer = require('inquirer');
 const { end, connect } = require('./db/connection');
 const { connection } = require('./db/index');
 // Optional: import asciiart-logo
@@ -44,15 +44,15 @@ function init() {
                     ]
                 },
             ])
-            
+
         )
         .then((answer) => {
             if (answer.start === "View all departments") {
-                viewDept(); 
+                viewDept();
             } else if (answer.start === "View all roles") {
-                viewRoles(); 
+                viewRo();
             } else if (answer.start === "View all employees") {
-                viewEmp();  
+                viewEmp();
             } else if (answer.start === "Add a departmen") {
                 addDept();
             } else if (answer.start === "Add a role") {
@@ -91,18 +91,27 @@ function init() {
 
 // function - View all employees
 function viewEmp() {
-  // 1. call find all employees method on database connection - db.method
+    // 1. call find all employees method on database connection - db.method
     db.viewEmployees()
-    .then((result) => {
-        console.table(result)
-        init();
-    })
-  //    in .then callback, display returned data with console table method
-  // 2. call function to load main prompt for questions
-  //
+        .then(([result]) => {
+            console.table(result)
+            init();
+        })
+    //    in .then callback, display returned data with console table method
+    // 2. call function to load main prompt for questions
+    //
 }
 
 // function - View all roles
+function viewRo() {
+    db.viewRoles()
+        .then(([result]) => {
+            console.table(result);
+        })
+        .then(() => {
+            init();
+        })
+};
 // 1. call find all roles method on database connection
 //    in .then callback, dispalay returned data with console table
 // 2. call function to load main prompt for questons
@@ -111,19 +120,47 @@ function viewEmp() {
 // function - View all deparments
 function viewDept() {
     db.viewDepartments()
-    .then(([result]) => {
-        console.table(result);
-    })
-    .then(()=> {
-        init();
-    })
-}
+        .then(([result]) => {
+            console.table(result);
+        })
+        .then(() => {
+            init();
+        })
+};
 //  1. call find all departments method on database connnection
 //      in .then call back, display returned data with console table
 //  2. call function to load main prompt for questions
 //
 
 // Add a department
+function init() {
+    inquirer
+        .prompt(
+            questions = ([
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'What department would you like to add?',
+                    choices: [
+                        "View all departments",
+                        "View all roles",
+                        "View all employees",
+                        "Add a department",
+                        "Add a role",
+                        "Add a employee",
+                        "Add a employee role",
+                        "Quit"
+                    ]
+                },
+            ])
+
+        )
+        .then((answer) => {
+            if (answer.start === "View all departments") {
+                viewDept();
+            }
+        })
+}
 //  1. prompt user for the name of the department
 //      in .then callback, call create department method on database connection, passing the returned data as input argument
 //  2. call function to load main prompt for questions
@@ -133,7 +170,7 @@ function viewDept() {
 //  **prompt for user to enter the role, the salary, and what department the role belongs to
 //  1. call find all departments method on database connection to get array of existing department records
 //      in .then call back, create array of objects with names and ids from returned data with .map() method
-    // CHOICES: [{ NAME, VALUE}, [{ NAME, VALUE}, ...]     id is inside VALUE (value of id) (good inquierer npm docs)->first link->repository
+// CHOICES: [{ NAME, VALUE}, [{ NAME, VALUE}, ...]     id is inside VALUE (value of id) (good inquierer npm docs)->first link->repository
 //  2. prompt user for title, salary, and department choosing from the list of departmernts created above
 //      in .then callback, call funcon to create role on database connection, passing returned data from prompt as input argument
 //  3. call function to load main prompt for questions
