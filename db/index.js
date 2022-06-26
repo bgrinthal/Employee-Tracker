@@ -59,7 +59,7 @@ class DB {
     }
     //  5. method - find all roles - join with departments to diplay department names
     viewRoles() {
-        return this.connection.query(
+        return this.connection.promise().query(
             `SELECT role.id, role.title, role.salary, department.name 
             FROM role 
             LEFT JOIN department ON role.department_id = department.id`
@@ -67,8 +67,8 @@ class DB {
     }
     //  6. method - create a new role - takes in role object as input parameter
     addRole(title, salary, index) {
-        return this.connection.query(
-            `INSERT INTO role (title, salary, department_id) VALUES ('${title}, ${salary}, ${index}')`
+        return this.connection.promise().query(
+            `INSERT INTO role (title, salary, department_id) VALUES ('${title}', '${salary}', '${index}')`
         );
     }
     //  7. method - find all departments

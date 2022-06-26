@@ -161,7 +161,7 @@ function addRo() {
     connection.query(`SELECT * FROM department`, (err, data) => {
         if (err) throw err;
 
-        for (let i = 0; i < data.length; i++) { 
+        for (let i = 0; i < data.length; i++) {
             departments.push(data[i].name)
         }
         inquirer
@@ -183,20 +183,14 @@ function addRo() {
                     choices: departments
                 }
             ]).then(({ title, salary, department_id }) => {
+                console.log(title, salary, department_id)
                 let index = departments.indexOf(department_id)
-                console.log(index)
                 db.addRole(title, salary, index)
                 console.log(`Added ${title} role!`)
                 init();
-                // let index = departments.indexOf(department_id)
-
-                // connection.query(`INSERT INTO role (title, salary, department_id) VALUES ('${title}', '${salary}', ${index})`, function (err, data) {
-                //     if (err) throw err;
-                //     console.log(`Added`)
-                    // init();
-                })
             })
-    }
+    })
+}
 
 //  **prompt for user to enter the role, the salary, and what department the role belongs to
 //  1. call find all departments method on database connection to get array of existing department records
