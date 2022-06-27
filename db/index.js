@@ -1,39 +1,12 @@
-/************************************************
-  REMOVE ALL COMMENTS BEFORE SUBMITTING YOUR HOMEWORK
-*************************************************/
-
-// STEPS
-// 1. Declare a class for database methods encapsulating all SQL statements
-// 2. Exports the database object instantiated (using "new") from the database class, passing connection object to the class constructor
-
-
-
-
-// As suggested in README.md guideline for this homework, you can choose to use constructor functions or class to develop the functions
-//  for SQL statements. Since class gives you cleaner syntax, this pseudo code is assumed that you use class for the implementation of
-//  SQL statements. Remember both constructor functions and classes are to be used to create objects.
-
-// HINT: To use promise wrapper, for example:
-//  const databaseConnection = mysql.createConnection({...});
-//  databaseConnection.promise().query(...);
-//
-//  - the whole query statement needs to be returned in the same line for the caller to receive the data with promise .then or async/await
-//        for example: return databaseConnection.promise().query(...);
-//  - all queries that take in parameters need to be prepared statements
-
-// =============
-// MAIN PROCESS
-// =============
-// import database connection from the current db folder
 const connection = require("./connection");
 
-// class - for database or database access object
+// class for database or database access object
 class DB {
-    //  1. constructor - takes in database connection as input parameter and assign it to the instant variable
+    //  constructor function w/ instant variable
     constructor(connection) {
         this.connection = connection
     }
-    //  2. method - find all employees, join with roles and departments to display their roles, salaries, departments, and managers
+    //  method to find all employees using mysql commands
     viewEmployees() {
         return this.connection.promise().query(
             `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(emp.first_name, ' ' , emp.last_name) AS manager
@@ -43,7 +16,7 @@ class DB {
             LEFT JOIN employee AS emp ON emp.id = employee.manager_id`
         );
     } 
-    //  3. method - create a new employee - takes employee object as input parameter
+    //  method to add new employees using mysql commands
     addEmployee(first_name, last_name, role_id, manager_id) {
         return this.connection.promise().query(
             `INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -51,14 +24,14 @@ class DB {
         );
     }
     
-    //  4. method - update employee's role - takes employee id and role id as input parameters
+    //  method to update employee roles using mysql commands
     updateEmployeeRole(employeeId, roleId) {
         return this.connection.promise().query(
             `UPDATE employee SET role_id = ${roleId} 
             WHERE id = ${employeeId}`
         );
     }
-    //  5. method - find all roles - join with departments to diplay department names
+    //  method to find all roles using mysql commands
     viewRoles() {
         return this.connection.promise().query(
             `SELECT role.id, role.title, role.salary, department.name 
@@ -66,14 +39,14 @@ class DB {
             LEFT JOIN department ON role.department_id = department.id`
         );
     }
-    //  6. method - create a new role - takes in role object as input parameter
+    //  method to add role using mysql commands
     addRole(title, salary, index) {
         return this.connection.promise().query(
             `INSERT INTO role (title, salary, department_id)
             VALUES ('${title}', '${salary}', '${index}')`
         );
     }
-    //  7. method - find all departments
+    //  method to find all departments using mysql commands
     viewDepartments() {
         return this.connection.promise().query(
             `SELECT department.id, department.name
@@ -83,7 +56,7 @@ class DB {
             GROUP BY department.id, department.name`
         );
     }
-    //  8. method - create a new department - takes in department object as input parameter
+    //  method to add new department using mysql commands
     addDepartment(department) {
         return this.connection.query(
             `INSERT INTO department (name) VALUES ('${department}')`
@@ -91,18 +64,5 @@ class DB {
     }
 };
 
+// export
 module.exports = new DB(connection);
-
-// ================
-// OPTIONAL METHODS
-// ================
-
-//  - method: Find all employees except the given employee id
-//  - method: Find all employees in a given department, join with roles to display role titles
-//  - method: Find all employees by manager, join with departments and roles to display titles and department names
-//  - method: Find all departments, join with employees and roles and sum up utilized department budget
-//  - method: Remove a department
-//  - method: Remove a role from the db
-//  - method: Update the given employee's manager
-//  - method: Remove an employee with the given id
-
