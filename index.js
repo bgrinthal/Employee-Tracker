@@ -1,10 +1,3 @@
-
-
-/*
-  REMOVE COMMENTS BEFORE SUBMITTING YOUR HOMEWORK
-*/
-
-// Import inquirer
 const inquirer = require('inquirer');
 const { end, connect } = require('./db/connection');
 const { connection } = require('./db/index');
@@ -39,7 +32,7 @@ function init() {
                         "Add a department",
                         "Add a role",
                         "Add an employee",
-                        "Add an employee role",
+                        "Update an employee role",
                         "Quit"
                     ]
                 },
@@ -59,8 +52,8 @@ function init() {
                 addRo();
             } else if (answer.start === "Add an employee") {
                 addEmp();
-            } else if (answer.start === "Update an employees role") {
-                updateEmployeeRole();
+            } else if (answer.start === "Update an employee role") {
+                updateEmpRole();
             } else {
                 exit();
             }
@@ -127,10 +120,6 @@ function viewDept() {
             init();
         })
 };
-//  1. call find all departments method on database connnection
-//      in .then call back, display returned data with console table
-//  2. call function to load main prompt for questions
-//
 
 // Add a department
 function addDept() {
@@ -150,10 +139,6 @@ function addDept() {
             init();
         })
 }
-//  1. prompt user for the name of the department
-//      in .then callback, call create department method on database connection, passing the returned data as input argument
-//  2. call function to load main prompt for questions
-//
 
 function addRo() {
     let departments = []
@@ -191,96 +176,12 @@ function addRo() {
     })
 }
 
-//  **prompt for user to enter the role, the salary, and what department the role belongs to
-//  1. call find all departments method on database connection to get array of existing department records
-//      in .then call back, create array of objects with names and ids from returned data with .map() method
-// CHOICES: [{ NAME, VALUE}, [{ NAME, VALUE}, ...]     id is inside VALUE (value of id) (good inquierer npm docs)->first link->repository
-//  2. prompt user for title, salary, and department choosing from the list of departmernts created above
-//      in .then callback, call funcon to create role on database connection, passing returned data from prompt as input argument
-//  3. call function to load main prompt for questions
-//
-
-// function - Add a new employee
-// function addEmp() {
-//     let employees = [];
-//     let roles = [];
-
-//     connection.query(`SELECT * FROM role`, (err, data) => {
-//         if (err) throw err;
-
-//         for (let i = 0; i < data.length; i++) {
-//             roles.push(data[i].title)
-//         }
-//         connection.query(`SELECT * FROM employee`), (err, data) => {
-//             if (err) throw err;
-
-//             for (let i = 0; i < data.length; i++) {
-//                 employees.push(data[i].first_name)
-//             }
-//         }
-//         inquirer
-//             .prompt([
-//                 {
-//                     type: 'input',
-//                     name: 'last_name',
-//                     message: 'Please enter your last name',
-//                 },
-//                 {
-//                     type: 'input',
-//                     name: 'first_name',
-//                     message: 'Please enter your first name',
-//                 },
-//                 {
-//                     type: 'list',
-//                     name: 'role_id',
-//                     message: 'What role does this employee belong to?',
-//                     choices: roles
-//                 },
-//                 {
-//                     type: 'list',
-//                     name: 'manager_id',
-//                     message: "Who is their manager?",
-//                     choices: ['none'].concat(employees)
-//                 }
-//             ]).then(({ first_name, last_name, role_id, manager_id }) => {
-//                 console.log(first_name, last_name, role_id, manager_id)
-//                 // let queryText = `INSERT INTO employee (first_name, last_name, role_id`;
-//                 let mngrIndex = employees.indexOf(manager_id);
-//                 let roleIndex = roles.indexOf(role_id)
-//                 db.addEmployee(first_name, last_name, roleIndex, mngrIndex)
-//                 // if (manager_id != 'none') {
-//                 //     queryText += `, manager_id) VALUES ('${first_name}', '${last_name}', ${roles.indexOf(role_id)}, ${employees.indexOf(manager_id) + 1})`
-//                 // } else {
-//                 //     queryText += `) VALUES ('${first_name}', '${last_name}', ${roles.indexOf(role_id) + 1})`
-//                 // }
-//                 // console.log(queryText)
-
-//                 // connection.query(queryText, function (err, data) {
-//                 //     if (err) throw err;
-
-//                 //     init();
-//                 // })
-//             })
-//     }
-//     )}
-
-//  1. prompt for first_name and last_name
-//      in .then callback, store the first namd and the last name to variables,
-//  2. call function to find all roles on database connection to get all existing roles
-//      in .then callback, create array of role objects with id and title from returned array of role data with .map()
-//  3. prompt user for the role for the employee choosing from a list (array) of role objecs
-//      in .then callback, store the role id to a variable,
-//  4. call function to find all employees on database connection
-//      in .then callback, create array of managers with id, first name, last name from the returned data with .map()
-//  5. prompt user for the manager from a list from the array of managers
-//      in .then callback, create an employee object with variables for first name, last name, role id, manager id
-//  6. call function to create employee on database connection, passing the employee object as input argument
-//      in .then callback, call function to load main prompt for questions
-
+// function to add a new employee
 function addEmp() {
     let employees = [];
     let roles = [];
 
+    // used to cycle through existing emplotee and roles and store them in array
     connection.query(`SELECT * FROM role`, function (err, data) {
         if (err) throw err;
 
@@ -321,8 +222,10 @@ function addEmp() {
                         choices: ['none'].concat(employees)
                     }
                 ]).then(({ first_name, last_name, role_id, manager_id }) => {
+                    //gets numeric index/id for input
                     let mngrIndex = employees.indexOf(manager_id);
                     let roleIndex = roles.indexOf(role_id);
+                    //calls function to run mysql
                     db.addEmployee(first_name, last_name, roleIndex, mngrIndex);
                     console.log(`Added employee ${first_name} ${last_name}!`)
                     init();
@@ -333,6 +236,50 @@ function addEmp() {
 }
 
 // function - Update an employee's role
+function updateEmpRole() {
+    let employees = [];
+    let roles = [];
+
+    connection.query(`SELECT * FROM role`, function (err, data) {
+        if (err) throw err;
+
+
+        for (let i = 0; i < data.length; i++) {
+            roles.push(data[i].title);
+        }
+
+        connection.query(`SELECT * FROM employee`, function (err, data) {
+            if (err) throw err;
+
+            for (let i = 0; i < data.length; i++) {
+                employees.push(data[i].first_name);
+            }
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'employee_id',
+                        message: 'Whose role needs to be updated?',
+                        choices: employees
+                    },
+                    {
+                        type: 'list',
+                        name: 'role_id',
+                        message: 'What is the new role?',
+                        choices: roles
+                    }
+                ]).then(({ employee_id, role_id }) => {
+                    let empIndex = employees.indexOf(employee_id);
+                    let roleIndex = roles.indexOf(role_id);
+                    db.updateEmployeeRole(empIndex, roleIndex);
+                    console.log(`Employee role updated!`)
+                    init();
+                })
+
+        })
+    })
+}
 //  1. call function to find all employees on database connection
 //      - in .then callback, take first name, last name, and id from the returned database data and create an array
 //        of new employee objects with .map().

@@ -53,7 +53,7 @@ class DB {
     
     //  4. method - update employee's role - takes employee id and role id as input parameters
     updateEmployeeRole(employeeId, roleId) {
-        return this.connection.query(
+        return this.connection.promise().query(
             `UPDATE employee SET role_id = ${roleId} 
             WHERE id = ${employeeId}`
         );
