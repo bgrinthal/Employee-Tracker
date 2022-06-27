@@ -38,8 +38,8 @@ function init() {
                         "View all employees",
                         "Add a department",
                         "Add a role",
-                        "Add a employee",
-                        "Add a employee role",
+                        "Add an employee",
+                        "Add an employee role",
                         "Quit"
                     ]
                 },
@@ -57,9 +57,9 @@ function init() {
                 addDept();
             } else if (answer.start === "Add a role") {
                 addRo();
-            } else if (answer.start === "Add a employee") {
-                addEmployee();
-            } else if (answer.start === "Add a employee role") {
+            } else if (answer.start === "Add an employee") {
+                addEmp();
+            } else if (answer.start === "Update an employees role") {
                 updateEmployeeRole();
             } else {
                 exit();
@@ -136,7 +136,7 @@ function viewDept() {
 function addDept() {
     inquirer
         .prompt(
-            questions = ([
+            ([
                 {
                     type: 'input',
                     name: 'department',
@@ -183,10 +183,9 @@ function addRo() {
                     choices: departments
                 }
             ]).then(({ title, salary, department_id }) => {
-                console.log(title, salary, department_id)
-                let index = departments.indexOf(department_id)
-                db.addRole(title, salary, index)
-                console.log(`Added ${title} role!`)
+                let index = departments.indexOf(department_id);
+                db.addRole(title, salary, index);
+                console.log(`Added ${title} role!`);
                 init();
             })
     })
@@ -202,6 +201,69 @@ function addRo() {
 //
 
 // function - Add a new employee
+// function addEmp() {
+//     let employees = [];
+//     let roles = [];
+
+//     connection.query(`SELECT * FROM role`, (err, data) => {
+//         if (err) throw err;
+
+//         for (let i = 0; i < data.length; i++) {
+//             roles.push(data[i].title)
+//         }
+//         connection.query(`SELECT * FROM employee`), (err, data) => {
+//             if (err) throw err;
+
+//             for (let i = 0; i < data.length; i++) {
+//                 employees.push(data[i].first_name)
+//             }
+//         }
+//         inquirer
+//             .prompt([
+//                 {
+//                     type: 'input',
+//                     name: 'last_name',
+//                     message: 'Please enter your last name',
+//                 },
+//                 {
+//                     type: 'input',
+//                     name: 'first_name',
+//                     message: 'Please enter your first name',
+//                 },
+//                 {
+//                     type: 'list',
+//                     name: 'role_id',
+//                     message: 'What role does this employee belong to?',
+//                     choices: roles
+//                 },
+//                 {
+//                     type: 'list',
+//                     name: 'manager_id',
+//                     message: "Who is their manager?",
+//                     choices: ['none'].concat(employees)
+//                 }
+//             ]).then(({ first_name, last_name, role_id, manager_id }) => {
+//                 console.log(first_name, last_name, role_id, manager_id)
+//                 // let queryText = `INSERT INTO employee (first_name, last_name, role_id`;
+//                 let mngrIndex = employees.indexOf(manager_id);
+//                 let roleIndex = roles.indexOf(role_id)
+//                 db.addEmployee(first_name, last_name, roleIndex, mngrIndex)
+//                 // if (manager_id != 'none') {
+//                 //     queryText += `, manager_id) VALUES ('${first_name}', '${last_name}', ${roles.indexOf(role_id)}, ${employees.indexOf(manager_id) + 1})`
+//                 // } else {
+//                 //     queryText += `) VALUES ('${first_name}', '${last_name}', ${roles.indexOf(role_id) + 1})`
+//                 // }
+//                 // console.log(queryText)
+
+//                 // connection.query(queryText, function (err, data) {
+//                 //     if (err) throw err;
+
+//                 //     init();
+//                 // })
+//             })
+//     }
+//     )}
+
 //  1. prompt for first_name and last_name
 //      in .then callback, store the first namd and the last name to variables,
 //  2. call function to find all roles on database connection to get all existing roles
@@ -214,6 +276,61 @@ function addRo() {
 //      in .then callback, create an employee object with variables for first name, last name, role id, manager id
 //  6. call function to create employee on database connection, passing the employee object as input argument
 //      in .then callback, call function to load main prompt for questions
+
+function addEmp() {
+    let employees = [];
+    let roles = [];
+
+    connection.query(`SELECT * FROM role`, function (err, data) {
+        if (err) throw err;
+
+
+        for (let i = 0; i < data.length; i++) {
+            roles.push(data[i].title);
+        }
+
+        connection.query(`SELECT * FROM employee`, function (err, data) {
+            if (err) throw err;
+
+            for (let i = 0; i < data.length; i++) {
+                employees.push(data[i].first_name);
+            }
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'input',
+                        name: 'last_name',
+                        message: 'Please enter your last name',
+                    },
+                    {
+                        type: 'input',
+                        name: 'first_name',
+                        message: 'Please enter your first name',
+                    },
+                    {
+                        type: 'list',
+                        name: 'role_id',
+                        message: 'What role does this employee belong to?',
+                        choices: roles
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager_id',
+                        message: "Who is their manager?",
+                        choices: ['none'].concat(employees)
+                    }
+                ]).then(({ first_name, last_name, role_id, manager_id }) => {
+                    let mngrIndex = employees.indexOf(manager_id);
+                    let roleIndex = roles.indexOf(role_id);
+                    db.addEmployee(first_name, last_name, roleIndex, mngrIndex);
+                    console.log(`Added employee ${first_name} ${last_name}!`)
+                    init();
+                })
+
+        })
+    })
+}
 
 // function - Update an employee's role
 //  1. call function to find all employees on database connection
@@ -238,21 +355,4 @@ function exit() {
     connection.end()
 };
 
-// ========================
-//  OPTIONAL
-// ========================
-
-// fuction - View all employees that belong to a department
-
-// function - View all employees that report to a specific manager
-
-// function - Update an employee's manager
-
-// function - View all departments and show their total utilized department budget
-
-// function - Delete an employee
-
-// function - Delete a department
-
-// function - Delete a role
 

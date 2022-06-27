@@ -44,12 +44,13 @@ class DB {
         );
     } 
     //  3. method - create a new employee - takes employee object as input parameter
-    addEmployee(employee) {
-        return this.connection.query(
-            `INSERT INTO employee SET ?`,
-            employee
+    addEmployee(first_name, last_name, role_id, manager_id) {
+        return this.connection.promise().query(
+            `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+            VALUES ('${first_name}', '${last_name}', '${role_id}', '${manager_id}')`
         );
     }
+    
     //  4. method - update employee's role - takes employee id and role id as input parameters
     updateEmployeeRole(employeeId, roleId) {
         return this.connection.query(
@@ -68,7 +69,8 @@ class DB {
     //  6. method - create a new role - takes in role object as input parameter
     addRole(title, salary, index) {
         return this.connection.promise().query(
-            `INSERT INTO role (title, salary, department_id) VALUES ('${title}', '${salary}', '${index}')`
+            `INSERT INTO role (title, salary, department_id)
+            VALUES ('${title}', '${salary}', '${index}')`
         );
     }
     //  7. method - find all departments
