@@ -135,7 +135,7 @@ function addRo() {
                 }
             ]).then(({ title, salary, department_id }) => {
                 // gets numberic index/id form input
-                let index = departments.indexOf(department_id);
+                let index = departments.indexOf(department_id)+1;
                 // calls method to run proper mysql commands
                 db.addRole(title, salary, index);
                 console.log(`Added ${title} role!`);
