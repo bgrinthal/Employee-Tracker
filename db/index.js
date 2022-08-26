@@ -15,7 +15,7 @@ class DB {
             LEFT JOIN department ON department.id = role.department_id
             LEFT JOIN employee AS emp ON emp.id = employee.manager_id`
         );
-    } 
+    }
     //  method to add new employees using mysql commands
     addEmployee(first_name, last_name, role_id, manager_id) {
         return this.connection.promise().query(
@@ -23,7 +23,7 @@ class DB {
             VALUES ('${first_name}', '${last_name}', '${role_id}', '${manager_id}')`
         );
     }
-    
+
     //  method to update employee roles using mysql commands
     updateEmployeeRole(employeeId, roleId) {
         return this.connection.promise().query(

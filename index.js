@@ -26,6 +26,7 @@ function init() {
                         "Add a role",
                         "Add an employee",
                         "Update an employee role",
+                        "Remove an emplyee",
                         "Quit"
                     ]
                 },
@@ -47,6 +48,8 @@ function init() {
                 addEmp();
             } else if (answer.start === "Update an employee role") {
                 updateEmpRole();
+            } else if (answer.start === "Remove an emplyee") {
+                removeEmployee();
             } else {
                 exit();
             }
@@ -249,6 +252,46 @@ function updateEmpRole() {
         })
     })
 }
+
+// Function to delete an Employee
+function removeEmployee(){
+    let sql = `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
+
+    connection.query(sql, (error, response) => {
+        if (error) throw error;
+        let employeeNamesArray = [];
+        response.forEach((employee) => { employeeNamesArray.push(`${employee.first_name} ${employee.last_name}`); });
+
+        inquirer
+            .prompt([
+                {
+                    name: 'chosenEmployee',
+                    type: 'list',
+                    message: 'Which employee would you like to remove?',
+                    choices: employeeNamesArray
+                }
+            ])
+            .then((answer) => {
+                let employeeId;
+
+                response.forEach((employee) => {
+                    if (
+                        answer.chosenEmployee ===
+                        `${employee.first_name} ${employee.last_name}`
+                    ) {
+                        employeeId = employee.id;
+                    }
+                });
+
+                let sql = `DELETE FROM employee WHERE employee.id = ?`;
+                connection.query(sql, [employeeId], (error) => {
+                    if (error) throw error;
+                    console.log(`Employee Successfully Removed!`);
+                    viewEmp();
+                });
+            });
+    });
+};
 
 // function to exit application
 function exit() {
