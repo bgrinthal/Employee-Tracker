@@ -144,7 +144,7 @@ function addRo() {
                 }
             ]).then(({ title, salary, department_id }) => {
                 // gets numberic index/id form input
-                let index = departments.indexOf(department_id)+1;
+                let index = departments.indexOf(department_id) + 1;
                 // calls method to run proper mysql commands
                 db.addRole(title, salary, index);
                 console.log(`Added ${title} role!`);
@@ -155,7 +155,7 @@ function addRo() {
 
 // function to add a new employee
 function addEmp() {
-    let employees = [];
+    let managers = [];
     let roles = [];
 
     // used to cycle through existing employee and roles and store them in array
@@ -167,11 +167,11 @@ function addEmp() {
             roles.push(data[i].title);
         }
 
-        connection.query(`SELECT * FROM employee`, function (err, data) {
+        connection.query(`SELECT first_name, last_name FROM employee WHERE manager_id IS NULL`, function (err, data) {
             if (err) throw err;
 
             for (let i = 0; i < data.length; i++) {
-                employees.push(data[i].first_name);
+                managers.push(data[i].first_name);
             }
 
             inquirer
@@ -196,15 +196,19 @@ function addEmp() {
                         type: 'list',
                         name: 'manager_id',
                         message: "Who is their manager?",
-                        choices: ['none'].concat(employees)
+                        choices: ['none'].concat(managers)
                     }
                 ]).then(({ first_name, last_name, role_id, manager_id }) => {
                     //gets numeric index/id for input
-                    let mngrIndex = employees.indexOf(manager_id);
-                    let roleIndex = roles.indexOf(role_id);
+                    console.log('Managers: ', managers);
+                    let mngrIndex = managers.indexOf(manager_id) + 1;
+                    console.log('managerId: ', mngrIndex);
+                    let roleIndex = roles.indexOf(role_id) + 1;
+                    console.log('roleId:  ', roleIndex);
                     //calls method to run mysql
                     db.addEmployee(first_name, last_name, roleIndex, mngrIndex);
                     console.log(`Added employee ${first_name} ${last_name}!`)
+                    viewEmp();
                     init();
                 })
 
@@ -260,7 +264,7 @@ function updateEmpRole() {
 }
 
 // Function to delete an Employee
-function removeEmployee(){
+function removeEmployee() {
 
     connection.query(`SELECT employee.id, employee.first_name, employee.last_name FROM employee`, (error, response) => {
         if (error) throw error;
@@ -301,68 +305,68 @@ function removeEmployee(){
 function removeRole() {
 
     connection.query(`SELECT role.id, role.title FROM role`, (error, response) => {
-      if (error) throw error;
-      let roleNamesArray = [];
-      response.forEach((role) => {roleNamesArray.push(role.title);});
+        if (error) throw error;
+        let roleNamesArray = [];
+        response.forEach((role) => { roleNamesArray.push(role.title); });
 
-      inquirer
-        .prompt([
-          {
-            name: 'chosenRole',
-            type: 'list',
-            message: 'Which role would you like to remove?',
-            choices: roleNamesArray
-          }
-        ])
-        .then((answer) => {
-          let roleId;
+        inquirer
+            .prompt([
+                {
+                    name: 'chosenRole',
+                    type: 'list',
+                    message: 'Which role would you like to remove?',
+                    choices: roleNamesArray
+                }
+            ])
+            .then((answer) => {
+                let roleId;
 
-          response.forEach((role) => {
-            if (answer.chosenRole === role.title) {
-              roleId = role.id;
-            }
-          });
+                response.forEach((role) => {
+                    if (answer.chosenRole === role.title) {
+                        roleId = role.id;
+                    }
+                });
 
-          connection.query(`DELETE FROM role WHERE role.id = ?`, [roleId], (error) => {
-            if (error) throw error;
-            console.log(`Role Successfully Removed`);
-            viewRo();
-          });
-        });
+                connection.query(`DELETE FROM role WHERE role.id = ?`, [roleId], (error) => {
+                    if (error) throw error;
+                    console.log(`Role Successfully Removed`);
+                    viewRo();
+                });
+            });
     });
-  };
+};
 
 // Function to delete a Department
-function removeDepartment(){
+function removeDepartment() {
     connection.query(`SELECT department.id, department.name FROM department`, (error, response) => {
-      if (error) throw error;
-      let departmentNamesArray = [];
-      response.forEach((department) => {departmentNamesArray.push(department.name);});
+        if (error) throw error;
+        let departmentNamesArray = [];
+        response.forEach((department) => { departmentNamesArray.push(department.name); });
 
-      inquirer
-        .prompt([
-          {
-            name: 'chosenDept',
-            type: 'list',
-            message: 'Which department would you like to remove?',
-            choices: departmentNamesArray
-          }
-        ])
-        .then((answer) => {
-          let departmentId;
+        inquirer
+            .prompt([
+                {
+                    name: 'chosenDept',
+                    type: 'list',
+                    message: 'Which department would you like to remove?',
+                    choices: departmentNamesArray
+                }
+            ])
+            .then((answer) => {
+                let departmentId;
 
-          response.forEach((department) => {
-            if (answer.chosenDept === department.name) {
-              departmentId = department.id;
-            }
-          });
+                response.forEach((department) => {
+                    if (answer.chosenDept === department.name) {
+                        departmentId = department.id;
+                    }
+                });
 
-          connection.query(`DELETE FROM department WHERE department.id = ?`, [departmentId], (error) => {
-            if (error) throw error;
-            console.log(`Department Successfully Removed`);
-            viewDept();
-          });
-        });
+                connection.query(`DELETE FROM department WHERE department.id = ?`, [departmentId], (error) => {
+                    if (error) throw error;
+                    console.log(`Department Successfully Removed`);
+                    viewDept();
+                });
+            });
     });
 };
 
