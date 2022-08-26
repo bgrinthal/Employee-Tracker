@@ -28,6 +28,7 @@ function init() {
                         "Update an employee role",
                         "Remove an emplyee",
                         "Remove a role",
+                        "Remove a department",
                         "Quit"
                     ]
                 },
@@ -53,6 +54,8 @@ function init() {
                 removeEmployee();
             } else if (answer.start === "Remove a role") {
                 removeRole();
+            } else if (answer.start === "Remove a department") {
+                removeDepartment();
             } else {
                 exit();
             }
@@ -155,10 +158,10 @@ function addEmp() {
     let employees = [];
     let roles = [];
 
-    // used to cycle through existing emplotee and roles and store them in array
+    // used to cycle through existing employee and roles and store them in array
     connection.query(`SELECT * FROM role`, function (err, data) {
         if (err) throw err;
-
+        // console.log(data)
 
         for (let i = 0; i < data.length; i++) {
             roles.push(data[i].title);
@@ -294,8 +297,8 @@ function removeEmployee(){
     });
 };
 
-// Delete a Role
-const removeRole = () => {
+// Function to delete a Role
+function removeRole() {
 
     connection.query(`SELECT role.id, role.title FROM role`, (error, response) => {
       if (error) throw error;
@@ -328,6 +331,40 @@ const removeRole = () => {
         });
     });
   };
+
+// Function to delete a Department
+function removeDepartment(){
+    connection.query(`SELECT department.id, department.name FROM department`, (error, response) => {
+      if (error) throw error;
+      let departmentNamesArray = [];
+      response.forEach((department) => {departmentNamesArray.push(department.name);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenDept',
+            type: 'list',
+            message: 'Which department would you like to remove?',
+            choices: departmentNamesArray
+          }
+        ])
+        .then((answer) => {
+          let departmentId;
+
+          response.forEach((department) => {
+            if (answer.chosenDept === department.name) {
+              departmentId = department.id;
+            }
+          });
+
+          connection.query(`DELETE FROM department WHERE department.id = ?`, [departmentId], (error) => {
+            if (error) throw error;
+            console.log(`Department Successfully Removed`);
+            viewDept();
+          });
+        });
+    });
+};
 
 // function to exit application
 function exit() {
