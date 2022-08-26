@@ -27,6 +27,7 @@ function init() {
                         "Add an employee",
                         "Update an employee role",
                         "Remove an emplyee",
+                        "Remove a role",
                         "Quit"
                     ]
                 },
@@ -50,6 +51,8 @@ function init() {
                 updateEmpRole();
             } else if (answer.start === "Remove an emplyee") {
                 removeEmployee();
+            } else if (answer.start === "Remove a role") {
+                removeRole();
             } else {
                 exit();
             }
@@ -255,9 +258,8 @@ function updateEmpRole() {
 
 // Function to delete an Employee
 function removeEmployee(){
-    let sql = `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
 
-    connection.query(sql, (error, response) => {
+    connection.query(`SELECT employee.id, employee.first_name, employee.last_name FROM employee`, (error, response) => {
         if (error) throw error;
         let employeeNamesArray = [];
         response.forEach((employee) => { employeeNamesArray.push(`${employee.first_name} ${employee.last_name}`); });
@@ -283,8 +285,7 @@ function removeEmployee(){
                     }
                 });
 
-                let sql = `DELETE FROM employee WHERE employee.id = ?`;
-                connection.query(sql, [employeeId], (error) => {
+                connection.query(`DELETE FROM employee WHERE employee.id = ?`, [employeeId], (error) => {
                     if (error) throw error;
                     console.log(`Employee Successfully Removed!`);
                     viewEmp();
@@ -292,6 +293,41 @@ function removeEmployee(){
             });
     });
 };
+
+// Delete a Role
+const removeRole = () => {
+
+    connection.query(`SELECT role.id, role.title FROM role`, (error, response) => {
+      if (error) throw error;
+      let roleNamesArray = [];
+      response.forEach((role) => {roleNamesArray.push(role.title);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenRole',
+            type: 'list',
+            message: 'Which role would you like to remove?',
+            choices: roleNamesArray
+          }
+        ])
+        .then((answer) => {
+          let roleId;
+
+          response.forEach((role) => {
+            if (answer.chosenRole === role.title) {
+              roleId = role.id;
+            }
+          });
+
+          connection.query(`DELETE FROM role WHERE role.id = ?`, [roleId], (error) => {
+            if (error) throw error;
+            console.log(`Role Successfully Removed`);
+            viewRo();
+          });
+        });
+    });
+  };
 
 // function to exit application
 function exit() {
