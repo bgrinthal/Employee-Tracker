@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const { end, connect } = require('./db/connection');
+const { end, connect, off } = require('./db/connection');
 const { connection } = require('./db/index');
 const db = require("./db/index");
 
@@ -167,7 +167,7 @@ function addEmp() {
             roles.push(data[i].title);
         }
 
-        connection.query(`SELECT first_name, last_name FROM employee WHERE manager_id IS NULL`, function (err, data) {
+        connection.query(`SELECT first_name, last_name FROM employee`, function (err, data) {
             if (err) throw err;
 
             for (let i = 0; i < data.length; i++) {
@@ -199,19 +199,22 @@ function addEmp() {
                         choices: ['none'].concat(managers)
                     }
                 ]).then(({ first_name, last_name, role_id, manager_id }) => {
+                    let mngrIndex;
                     //gets numeric index/id for input
-                    console.log('Managers: ', managers);
-                    let mngrIndex = managers.indexOf(manager_id) + 1;
-                    console.log('managerId: ', mngrIndex);
                     let roleIndex = roles.indexOf(role_id) + 1;
-                    console.log('roleId:  ', roleIndex);
-                    //calls method to run mysql
-                    db.addEmployee(first_name, last_name, roleIndex, mngrIndex);
-                    console.log(`Added employee ${first_name} ${last_name}!`)
+                    //Checks if emplpyee has no manager
+                    if(manager_id === 'none'){
+                        //calls method to run mysql
+                        db.addEmployee(first_name, last_name, roleIndex, 0);
+                        console.log(`Added employee ${first_name} ${last_name}!`)
+                    } else {
+                        mngrIndex = managers.indexOf(manager_id) + 1;
+                        //calls method to run mysql
+                        db.addEmployee(first_name, last_name, roleIndex, mngrIndex);
+                        console.log(`Added employee ${first_name} ${last_name}!`)
+                    }
                     viewEmp();
-                    init();
                 })
-
         })
     })
 }
